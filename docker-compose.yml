@@ -1,0 +1,35 @@
+version: "3.2"
+
+services:
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=sbir_ehb
+      - POSTGRES_PASSWORD=sbir
+      - PGDATA=/pgdata
+    volumes:
+      - pgdata:/pgdata
+    expose:
+      - 5432
+    ports:
+      - 54325:5432
+
+  api:
+    build: ./api
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:sbir@db/sbir_ehb
+      - NODE_ENV=development
+      - PORT=8000
+    volumes:
+      - type: bind
+        source: ./api
+        target: /app
+        consistency: delegated
+      - /app/node_modules
+    ports:
+      - 8081:8000
+
+volumes:
+  pgdata:

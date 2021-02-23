@@ -1,0 +1,25 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "@koa/router": "^10.0.0",
+    "knex": "^0.21.18",
+    "koa": "^2.13.1",
+    "pg": "^8.5.1"
+  },
+  "devDependencies": {
+    "@18f/18f-eslint": "^1.2.5",
+    "prettier": "^2.2.1"
+  },
+  "scripts": {
+    "lint": "18f-eslint",
+    "migrate": "knex migrate:latest",
+    "start-dev": "npm run migrate && npx nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "prettier": {}
+}
