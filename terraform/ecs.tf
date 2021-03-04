@@ -12,8 +12,10 @@ data "template_file" "api" {
     DB_USER        = aws_db_instance.main.username
     DB_PASSWORD    = aws_db_instance.main.password
     PORT           = var.app_port
+    LOG_GROUP      = aws_cloudwatch_log_group.main.name
+    LOG_REGION     = var.region
     REPOSITORY_URL = replace(aws_ecr_repository.ehb_prototype_api.repository_url, "https://", "")
-    IMAGE_VERSION  = "0.0.1"
+    IMAGE_VERSION  = "0.0.3"
   }
 }
 

@@ -13,6 +13,14 @@
       "name": "DATABASE_URL",
       "value": "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/ehb"
     }],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "${LOG_GROUP}",
+        "awslogs-region": "${LOG_REGION}",
+        "awslogs-stream-prefix": "ehb-ecs"
+      }
+    },
     "portMappings": [
       {
         "containerPort": ${PORT},

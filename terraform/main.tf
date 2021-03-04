@@ -9,5 +9,5 @@ terraform {
 
 provider "aws" {
   profile = "tts-sandbox"
-  region  = "us-east-2"
+  region  = var.region
 }

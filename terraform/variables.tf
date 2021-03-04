@@ -13,3 +13,7 @@ variable "app_port" {
 variable "health_check_path" {
   default = "/heartbeat"
 }
+
+variable "region" {
+  default = "us-east-2"
+}
