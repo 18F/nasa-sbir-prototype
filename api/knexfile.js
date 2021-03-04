@@ -10,4 +10,14 @@ module.exports = {
       password: process.env.DB_PASSWORD || "sbir",
     },
   },
+
+  production: {
+    client: "postgresql",
+    connection: {
+      host: process.env_DB_HOST,
+      database: process.env.DB_NAME || "sbir_ehb",
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+    },
+  },
 };

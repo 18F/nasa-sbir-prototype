@@ -1,18 +1,20 @@
 const Koa = require("koa");
 const Router = require("@koa/router");
+const v1routes = require("./v1");
 
 const main = async () => {
   const app = new Koa();
   const port = process.env.PORT || 8000;
 
-  const router = new Router();
+  const v1 = v1routes();
+  app.use(v1.routes(), v1.allowedMethods());
 
-  router.get("/", (ctx, next) => {
-    ctx.body = "Hello bub";
-    next();
+  const base = new Router();
+  base.get("/heartbeat", async (ctx, next) => {
+    ctx.body = { ok: true };
+    return next();
   });
-
-  app.use(router.routes());
+  app.use(base.routes(), base.allowedMethods());
 
   app.listen(port, () => {
     console.log(`now listening on ${port}`);
