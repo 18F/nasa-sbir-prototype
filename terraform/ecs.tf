@@ -8,6 +8,7 @@ resource "aws_ecs_cluster" "main" {
 data "template_file" "api" {
   template = file("ecs_task_definition.json.tpl")
   vars = {
+    DB_NAME        = aws_db_instance.main.name
     DB_HOST        = aws_db_instance.main.address
     DB_USER        = aws_db_instance.main.username
     DB_PASSWORD    = aws_db_instance.main.password

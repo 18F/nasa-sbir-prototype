@@ -31,7 +31,7 @@ resource "aws_security_group" "rds" {
 
   ingress {
     from_port       = 0
-    to_port         = aws_db_instance.main.port
+    to_port         = 5432
     protocol        = "tcp"
     security_groups = [aws_security_group.ecs_tasks.id]
   }
@@ -42,7 +42,6 @@ resource "aws_security_group" "rds" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 
   tags = merge(
     var.default_tags,

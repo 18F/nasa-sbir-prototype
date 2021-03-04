@@ -24,6 +24,7 @@ resource "aws_db_instance" "main" {
   engine_version             = "13.1"
   auto_minor_version_upgrade = true
   multi_az                   = false
+  vpc_security_group_ids     = [aws_security_group.rds.id]
 
   username = "ehb"
   password = random_password.database_password.result

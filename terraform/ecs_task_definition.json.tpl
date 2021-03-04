@@ -11,7 +11,7 @@
       "value": "production"
     },{
       "name": "DATABASE_URL",
-      "value": "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/ehb"
+      "value": "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}"
     }],
     "logConfiguration": {
       "logDriver": "awslogs",
