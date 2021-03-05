@@ -1,41 +1,41 @@
 resource "aws_ecs_cluster" "main" {
-  name = "ehb_prototype_api"
+  name = "${var.resource_prefix}-api"
   tags = merge(
     var.default_tags
   )
 }
 
-data "template_file" "api" {
+data "template_file" "api_task_definition" {
   template = file("ecs_task_definition.json.tpl")
   vars = {
     DB_NAME        = aws_db_instance.main.name
     DB_HOST        = aws_db_instance.main.address
-    DB_USER        = aws_db_instance.main.username
-    DB_PASSWORD    = aws_db_instance.main.password
-    PORT           = var.app_port
-    LOG_GROUP      = aws_cloudwatch_log_group.main.name
-    LOG_REGION     = var.region
-    REPOSITORY_URL = replace(aws_ecr_repository.ehb_prototype_api.repository_url, "https://", "")
-    IMAGE_VERSION  = "0.0.3"
+    DB_USER        = urlencode(aws_db_instance.main.username)
+    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    PORT           = var.api_port
+    LOG_GROUP      = aws_cloudwatch_log_group.api.name
+    LOG_REGION     = var.aws_region
+    REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
+    IMAGE_VERSION  = var.api_container_version
   }
 }
 
 resource "aws_ecs_task_definition" "api" {
-  family                   = "api-task"
+  family                   = "${var.resource_prefix}-api"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
-  container_definitions    = data.template_file.api.rendered
+  container_definitions    = data.template_file.api_task_definition.rendered
 
   tags = merge(
     var.default_tags
   )
 }
 
-resource "aws_ecs_service" "main" {
-  name            = "api-service"
+resource "aws_ecs_service" "api" {
+  name            = "${var.resource_prefix}-api"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.api.arn
   desired_count   = 1
@@ -48,20 +48,20 @@ resource "aws_ecs_service" "main" {
   }
 
   load_balancer {
-    target_group_arn = aws_alb_target_group.app.id
+    target_group_arn = aws_lb_target_group.api.id
     container_name   = "api"
-    container_port   = var.app_port
+    container_port   = var.api_port
   }
 
-  depends_on = [aws_alb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_policy]
+  depends_on = [aws_lb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_policy]
 
   tags = merge(
     var.default_tags
   )
 }
 
-resource "aws_ecr_repository" "ehb_prototype_api" {
-  name = "ehb_prototype_api"
+resource "aws_ecr_repository" "api" {
+  name = "${var.resource_prefix}-api"
   tags = merge(
     var.default_tags
   )

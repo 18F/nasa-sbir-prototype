@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_log_group" "main" {
-  name = "nasa_sbir_prototype"
+resource "aws_cloudwatch_log_group" "api" {
+  name = "${var.resource_prefix}-api"
 
   tags = merge(
     var.default_tags

@@ -8,6 +8,6 @@ terraform {
 }
 
 provider "aws" {
-  profile = "tts-sandbox"
-  region  = var.region
+  profile = var.aws_profile
+  region  = var.aws_region
 }
