@@ -7,7 +7,7 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
@@ -18,8 +18,8 @@ resource "aws_subnet" "private" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
   vpc_id            = aws_vpc.main.id
   tags = merge(
-    var.default_tags,
-    { Name = "${var.resource_prefix}-private-${count.index}" }
+    local.tags,
+    { Name = "${local.resource_prefix}-private-${count.index}" }
   )
 }
 
@@ -31,8 +31,8 @@ resource "aws_subnet" "public" {
   vpc_id                  = aws_vpc.main.id
   map_public_ip_on_launch = true
   tags = merge(
-    var.default_tags,
-    { Name = "${var.resource_prefix}-public-${count.index}" }
+    local.tags,
+    { Name = "${local.resource_prefix}-public-${count.index}" }
   )
 }
 
@@ -40,7 +40,7 @@ resource "aws_subnet" "public" {
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
@@ -57,8 +57,8 @@ resource "aws_eip" "internet" {
   vpc        = true
   depends_on = [aws_internet_gateway.main]
   tags = merge(
-    var.default_tags,
-    { Name = "${var.resource_prefix}-${count.index}" }
+    local.tags,
+    { Name = "${local.resource_prefix}-${count.index}" }
   )
 }
 
@@ -67,8 +67,8 @@ resource "aws_nat_gateway" "internet" {
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   allocation_id = element(aws_eip.internet.*.id, count.index)
   tags = merge(
-    var.default_tags,
-    { Name = "${var.resource_prefix}-${count.index}" }
+    local.tags,
+    { Name = "${local.resource_prefix}-${count.index}" }
   )
 }
 
@@ -84,8 +84,8 @@ resource "aws_route_table" "private" {
   }
 
   tags = merge(
-    var.default_tags,
-    { Name = "${var.resource_prefix}-${count.index}" }
+    local.tags,
+    { Name = "${local.resource_prefix}-${count.index}" }
   )
 }
 

@@ -11,11 +11,11 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${var.resource_prefix}-ecs"
+  name               = "${local.resource_prefix}-ecs"
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 

@@ -1,7 +1,7 @@
 resource "aws_ecs_cluster" "main" {
-  name = "${var.resource_prefix}-api"
+  name = "${local.resource_prefix}-api"
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
@@ -12,7 +12,7 @@ data "template_file" "api_task_definition" {
     DB_HOST        = aws_db_instance.main.address
     DB_USER        = urlencode(aws_db_instance.main.username)
     DB_PASSWORD    = urlencode(aws_db_instance.main.password)
-    PORT           = var.api_port
+    PORT           = local.api_port
     LOG_GROUP      = aws_cloudwatch_log_group.api.name
     LOG_REGION     = var.aws_region
     REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
@@ -21,7 +21,7 @@ data "template_file" "api_task_definition" {
 }
 
 resource "aws_ecs_task_definition" "api" {
-  family                   = "${var.resource_prefix}-api"
+  family                   = "${local.resource_prefix}-api"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
@@ -30,12 +30,12 @@ resource "aws_ecs_task_definition" "api" {
   container_definitions    = data.template_file.api_task_definition.rendered
 
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
 resource "aws_ecs_service" "api" {
-  name            = "${var.resource_prefix}-api"
+  name            = "${local.resource_prefix}-api"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.api.arn
   desired_count   = 1
@@ -50,19 +50,19 @@ resource "aws_ecs_service" "api" {
   load_balancer {
     target_group_arn = aws_lb_target_group.api.id
     container_name   = "api"
-    container_port   = var.api_port
+    container_port   = local.api_port
   }
 
   depends_on = [aws_lb_listener.front_end, aws_iam_role_policy_attachment.ecs_task_execution_policy]
 
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
 resource "aws_ecr_repository" "api" {
-  name = "${var.resource_prefix}-api"
+  name = "${local.resource_prefix}-api"
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }

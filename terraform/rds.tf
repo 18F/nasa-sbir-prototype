@@ -10,17 +10,17 @@ resource "random_string" "database_username" {
 }
 
 resource "aws_db_subnet_group" "default" {
-  name       = var.resource_prefix
+  name       = local.resource_prefix
   subnet_ids = aws_subnet.private.*.id
 
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }
 
 resource "aws_db_instance" "main" {
-  name                 = replace(var.resource_prefix, "/[^a-zA-Z0-9]/", "")
-  identifier           = "${var.resource_prefix}-db"
+  name                 = replace(local.resource_prefix, "/[^a-zA-Z0-9]/", "")
+  identifier           = "${local.resource_prefix}-db"
   db_subnet_group_name = aws_db_subnet_group.default.name
 
   allocated_storage          = 100 # this is the minimum-allowed value
@@ -42,6 +42,6 @@ resource "aws_db_instance" "main" {
   skip_final_snapshot = true
 
   tags = merge(
-    var.default_tags
+    local.tags
   )
 }

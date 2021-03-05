@@ -1,36 +1,34 @@
 variable "aws_profile" {
+  type    = string
   default = "tts-sandbox"
 }
 
 variable "aws_region" {
+  type    = string
   default = "us-east-2"
 }
 
 variable "az_count" {
-  default = "2"
+  type    = number
+  default = 2
 }
 
-variable "default_tags" {
-  default = {
-    Name    = "ehb-prototype"
+locals {
+  tags = {
+    Name    = local.resource_prefix
     project = "1337_nasa_sbir"
   }
-}
-
-variable "health_check_path" {
-  default = "/heartbeat"
-}
-
-variable "resource_prefix" {
-  default = "ehb-prototype"
+  resource_prefix = "ehb-prototype"
 }
 
 # === App-specific ===
 
-variable "api_container_version" {
-  default = "latest"
+locals {
+  api_health_check_path = "/heartbeat"
+  api_port              = 8000
 }
 
-variable "api_port" {
-  default = "8000"
+variable "api_container_version" {
+  type    = string
+  default = "latest"
 }
