@@ -3,3 +3,4 @@ node_modules
 .terraform
 .terraform*
 terraform.tfstate*
+.DS_Store
