@@ -16,6 +16,7 @@
   "scripts": {
     "lint": "18f-eslint",
     "migrate": "knex migrate:latest",
+    "start": "npx nodemon index.js",
     "start-dev": "npm run migrate && npx nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

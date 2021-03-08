@@ -5,9 +5,19 @@ resource "aws_ecs_cluster" "main" {
   )
 }
 
-data "template_file" "api_task_definition" {
-  template = file("ecs_task_definition.json.tpl")
-  vars = {
+locals {
+  migration_task_template = templatefile("${path.module}/ecs_task_migrate.json.tpl", {
+    DB_NAME        = aws_db_instance.main.name
+    DB_HOST        = aws_db_instance.main.address
+    DB_USER        = urlencode(aws_db_instance.main.username)
+    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    LOG_GROUP      = aws_cloudwatch_log_group.api.name
+    LOG_REGION     = var.aws_region
+    REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
+    IMAGE_VERSION  = var.api_container_version
+  })
+
+  service_task_template = templatefile("${path.module}/ecs_task_definition.json.tpl", {
     DB_NAME        = aws_db_instance.main.name
     DB_HOST        = aws_db_instance.main.address
     DB_USER        = urlencode(aws_db_instance.main.username)
@@ -17,7 +27,7 @@ data "template_file" "api_task_definition" {
     LOG_REGION     = var.aws_region
     REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
     IMAGE_VERSION  = var.api_container_version
-  }
+  })
 }
 
 resource "aws_ecs_task_definition" "api" {
@@ -27,7 +37,21 @@ resource "aws_ecs_task_definition" "api" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = 256
   memory                   = 512
-  container_definitions    = data.template_file.api_task_definition.rendered
+  container_definitions    = local.service_task_template
+
+  tags = merge(
+    local.tags
+  )
+}
+
+resource "aws_ecs_task_definition" "database_migration" {
+  family                   = "${local.resource_prefix}-database-migration"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+  container_definitions    = local.migration_task_template
 
   tags = merge(
     local.tags
