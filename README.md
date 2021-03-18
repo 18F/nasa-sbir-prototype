@@ -1,6 +1,53 @@
-# Prototype for NASA SBIR
+# Prototype for NASA SBIR infrastructure
 
-Doesn't do much yet. Maybe it will soon!
+1. Build all the infrastructure
+   ```bash
+   cd terraform
+   terraform apply
+   ```
+
+2. Log into the AWS container registry
+   ```bash
+   aws ecr get-login-password --region [whichever] | docker login \
+     --username AWS \
+     --password-stdin \
+     001907687576.dkr.ecr.us-east-2.amazonaws.com
+   ```
+   **NOTE** that the address to log into may change. Log into the AWS management
+   console, [browse to the ECR page](https://us-east-2.console.aws.amazon.com/ecr/repositories),
+   click the `ehb-prototype-api` repository, and click the "View push commands"
+   button at the top of the page for instructions.
+
+3. Build the API Docker image
+   ```bash
+   docker build \
+     -t 001907687576.dkr.ecr.us-east-2.amazonaws.com/ehb-prototype-api:latest \
+     api \
+     -f api/Dockerfile.prod
+   ```
+
+4. Push the Docker image to the AWS container registry
+   ```bash
+   docker push 001907687576.dkr.ecr.us-east-2.amazonaws.com/ehb-prototype-api:latest
+   ```
+
+5. Shortly after the image gets pushed up, AWS will start the API service. In
+   the meantime, you'll want to go ahead and setup the database. Run the initial
+   migration, relying on outputs from Terraform.
+   ```bash
+   cd terraform
+   aws ecs run-task \
+     --task-definition "$(terraform output -raw migration_task_definition)" \
+     --cluster "$(terraform output -raw api_cluster)" \
+     --network-configuration "awsvpcConfiguration={subnets=[$(terraform output -raw subnet_private)],securityGroups=[$(terraform output -raw task_security_group)],assignPublicIp=DISABLED}" \
+     --launch-type FARGATE
+   ```
+
+6. Hooray, your thing is online! You can find the URL for the API with Terraform
+   ```bash
+   cd terraform
+   terraform output api_dns
+   ```
 
 ## Contributing
 

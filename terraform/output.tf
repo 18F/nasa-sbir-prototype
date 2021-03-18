@@ -17,3 +17,7 @@ output "task_security_group" {
 output "subnet_private" {
   value = aws_subnet.private.0.id
 }
+
+output "api_dns" {
+  value = aws_lb.api.dns_name
+}
