@@ -1,4 +1,4 @@
-FROM node:14
+FROM node:14 AS build
 
 RUN mkdir /app
 WORKDIR /app
@@ -7,6 +7,10 @@ COPY ./package.json .
 COPY ./package-lock.json .
 
 RUN npm install
+
+FROM node:14-slim
+
+COPY --from=build /app/node_modules /app/node_modules
 
 COPY ./ ./
 

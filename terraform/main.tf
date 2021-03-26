@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket  = "1337-nasa-sbir-terraform"
+    bucket  = "terraform.sandbox.sbir.nasa"
     key     = "terraform.tfstate"
-    profile = "tts-sandbox"
-    region  = "us-east-2"
+    profile = "sbir-sandbox"
+    region  = "us-east-1"
   }
 
   required_providers {

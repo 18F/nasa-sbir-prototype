@@ -1,11 +1,11 @@
 variable "aws_profile" {
   type    = string
-  default = "tts-sandbox"
+  default = "sbir-sandbox"
 }
 
 variable "aws_region" {
   type    = string
-  default = "us-east-2"
+  default = "us-east-1"
 }
 
 variable "az_count" {
