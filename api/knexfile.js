@@ -9,6 +9,9 @@ module.exports = {
       user: process.env.DB_USER || "postgres",
       password: process.env.DB_PASSWORD || "sbir",
     },
+    seeds: {
+      directory: "./data/seed",
+    },
   },
 
   production: {

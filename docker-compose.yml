@@ -30,6 +30,13 @@ services:
       - /app/node_modules
     ports:
       - 8081:8000
+  
+  web:
+    image: nginx:stable
+    volumes:
+      - ./web/src:/usr/share/nginx/html
+    ports:
+      - 8080:80
 
 volumes:
   pgdata:

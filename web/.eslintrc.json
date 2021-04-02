@@ -4,10 +4,11 @@
     "prettier"
   ],
   "rules": {
+    "import/extensions": ["error", "always"],
     "no-param-reassign": ["error", { "props": false }]
   },
   "env": {
     "es6": true,
-    "node": true
+    "browser": true
   }
 }

@@ -1,10 +1,13 @@
 const Koa = require("koa");
+const cors = require("@koa/cors");
 const Router = require("@koa/router");
 const v1routes = require("./v1");
 
 const main = async () => {
   const app = new Koa();
   const port = process.env.PORT || 8000;
+
+  app.use(cors());
 
   const v1 = v1routes();
   app.use(v1.routes(), v1.allowedMethods());

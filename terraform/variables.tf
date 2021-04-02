@@ -13,6 +13,10 @@ variable "az_count" {
   default = 2
 }
 
+variable "permission_boundary" {
+  type = string
+}
+
 locals {
   tags = {
     Name    = local.resource_prefix

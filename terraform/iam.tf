@@ -11,8 +11,9 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name               = "${local.resource_prefix}-ecs"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+  name                 = "${local.resource_prefix}-ecs"
+  assume_role_policy   = data.aws_iam_policy_document.assume_role_policy.json
+  permissions_boundary = var.permission_boundary
 
   tags = merge(
     local.tags

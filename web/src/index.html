@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@100;700&display=swap");
+
+      body {
+        font-family: "Public Sans", sans-serif;
+      }
+
+      #subtopic-grid {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 50vh 50vh;
+      }
+
+      svg {
+        max-height: 45vh;
+        max-width: 45vw;
+      }
+
+      svg .grid-line g.tick line {
+        stroke-opacity: 0.1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" style="display: none">
+      <div v-if="view === 'all_subtopics'">
+        <ul>
+          <li v-for="subtopic in subtopics">
+            <strong
+              ><a v-bind:href="`#subtopic:${subtopic[0]}`"
+                >{{ subtopic[0] }}</a
+              ></strong
+            >
+            - {{ subtopic[1].proposals }} proposals - {{ subtopic[1].awards }}
+            awards - {{ subtopic[1].ratio }} ratio
+          </li>
+        </ul>
+      </div>
+
+      <div v-if="view === 'single_subtopic' && subtopic">
+        <h1>{{subtopic.id}}</h1>
+
+        <div id="subtopic-grid">
+          <div v-for="phase in subtopic.phases">
+            <h2>Phase {{phase.phase}}</h2>
+            <div v-bind:id="`graph_phase_${phase.phase}`"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <script type="module" type="text/javascript" src="index.js"></script>
+  </body>
+</html>
