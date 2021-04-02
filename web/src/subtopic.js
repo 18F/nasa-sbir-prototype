@@ -3,7 +3,9 @@ import { makeGraph } from "./graph.js";
 const subtopics = new Promise((resolve, reject) => {
   fetch("//localhost:8081/v1/subtopics/")
     .then((response) => response.json())
-    .then((json) => resolve(json))
+    .then((json) => {
+      resolve(Object.entries(json).map(([id, body]) => ({ id, ...body })));
+    })
     .catch(() => reject());
 });
 

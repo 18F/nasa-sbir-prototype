@@ -16,7 +16,9 @@ const getAllSubtopics = async (subtopicId = false) => {
       );
 
   const proposals = subtopicId
-    ? await db("proposals").where({ subtopic: subtopicId }).select()
+    ? await db("proposals")
+        .where({ subtopic: subtopicId === "null" ? null : subtopicId })
+        .select()
     : await db("proposals").select();
 
   return subtopics.reduce((all, programSubtopic) => {
@@ -24,7 +26,10 @@ const getAllSubtopics = async (subtopicId = false) => {
       ...all,
       [programSubtopic]: {
         ...getAwardStats(
-          proposals.filter(({ subtopic }) => subtopic === programSubtopic)
+          proposals.filter(
+            ({ subtopic }) =>
+              subtopic === (programSubtopic === "null" ? null : programSubtopic)
+          )
         ),
       },
     };
@@ -106,7 +111,9 @@ const getAllSubtopicsByPhaseAndYear = async (subtopicId = false) => {
 
   await Promise.all(
     Object.entries(subtopics).map(async ([id, subtopic]) => {
-      const proposals = await db("proposals").where({ subtopic: id }).select();
+      const proposals = await db("proposals")
+        .where({ subtopic: id === "null" ? null : id })
+        .select();
 
       subtopic.phases = phases.map((phase) => {
         const phaseProposals = proposals.filter(

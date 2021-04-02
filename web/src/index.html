@@ -9,6 +9,19 @@
         font-family: "Public Sans", sans-serif;
       }
 
+      #all-subtopics table thead th {
+        background: white;
+        border-bottom: 1px solid black;
+        cursor: pointer;
+        padding-right: 20px;
+        position: sticky;
+        top: 0;
+      }
+
+      #all-subtopics table tbody tr:nth-child(even) {
+        background: #eef;
+      }
+
       #subtopic-grid {
         display: grid;
         grid-template-columns: 50% 50%;
@@ -27,28 +40,28 @@
   </head>
   <body>
     <div id="app" style="display: none">
-      <div v-if="view === 'all_subtopics'">
+      <div id="all-subtopics" v-if="view === 'all_subtopics'">
         <table>
           <thead>
             <tr>
-              <th>Subtopoic</th>
-              <th>Proposals</th>
-              <th>Awards</th>
-              <th>Ratio</th>
+              <th v-on:click="sortSubtopicsBy('id')">Subtopoic</th>
+              <th v-on:click="sortSubtopicsBy('proposals')">Proposals</th>
+              <th v-on:click="sortSubtopicsBy('awards')">Awards</th>
+              <th v-on:click="sortSubtopicsBy('ratio')">Ratio</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="subtopic in subtopics">
               <td>
                 <strong
-                  ><a v-bind:href="`#subtopic:${subtopic[0]}`"
-                    >{{ subtopic[0] }}</a
+                  ><a v-bind:href="`#subtopic:${subtopic.id}`"
+                    >{{ subtopic.id }}</a
                   ></strong
                 >
               </td>
-              <td>{{subtopic[1].proposals}}</td>
-              <td>{{subtopic[1].awards}}</td>
-              <td>{{subtopic[1].ratio}}</td>
+              <td>{{subtopic.proposals}}</td>
+              <td>{{subtopic.awards}}</td>
+              <td>{{subtopic.ratio}}</td>
             </tr>
           </tbody>
         </table>

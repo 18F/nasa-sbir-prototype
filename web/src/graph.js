@@ -83,6 +83,10 @@ const makeGraph = (
     y: Array.isArray(yValue) ? yValue : [yValue],
   }));
 
+  // for (let i = 0; i < graphData.length - 1; i += 2) {
+  //   graphData.splice(i + 1, 0, { x: graphData[i].x + 1, y: graphData[i].y });
+  // }
+
   if (graphData.length > 0) {
     const graphCount = graphData[0].y.length;
 
