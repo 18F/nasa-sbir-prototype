@@ -15,6 +15,7 @@ const setSubtopic = async (app, id) => {
 
   app.view = "single_subtopic";
   app.subtopic = { ...subtopic[id], id };
+  window.scrollTo(0, 0);
 
   const graphOptions = {
     height: 300,

@@ -28,17 +28,30 @@
   <body>
     <div id="app" style="display: none">
       <div v-if="view === 'all_subtopics'">
-        <ul>
-          <li v-for="subtopic in subtopics">
-            <strong
-              ><a v-bind:href="`#subtopic:${subtopic[0]}`"
-                >{{ subtopic[0] }}</a
-              ></strong
-            >
-            - {{ subtopic[1].proposals }} proposals - {{ subtopic[1].awards }}
-            awards - {{ subtopic[1].ratio }} ratio
-          </li>
-        </ul>
+        <table>
+          <thead>
+            <tr>
+              <th>Subtopoic</th>
+              <th>Proposals</th>
+              <th>Awards</th>
+              <th>Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="subtopic in subtopics">
+              <td>
+                <strong
+                  ><a v-bind:href="`#subtopic:${subtopic[0]}`"
+                    >{{ subtopic[0] }}</a
+                  ></strong
+                >
+              </td>
+              <td>{{subtopic[1].proposals}}</td>
+              <td>{{subtopic[1].awards}}</td>
+              <td>{{subtopic[1].ratio}}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div v-if="view === 'single_subtopic' && subtopic">
