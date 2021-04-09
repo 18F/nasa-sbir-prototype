@@ -4,7 +4,7 @@
 resource "aws_security_group" "lb" {
   name        = "${local.resource_prefix}-load-balancer"
   description = "controls access to the ALB"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 0
@@ -30,7 +30,7 @@ resource "aws_security_group" "lb" {
 resource "aws_security_group" "rds" {
   name        = "${local.resource_prefix}-database"
   description = "allows Postgres traffic to RDS from ECS only"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port       = 0
@@ -56,7 +56,7 @@ resource "aws_security_group" "rds" {
 resource "aws_security_group" "ecs_tasks" {
   name        = "${local.resource_prefix}-ecs-task"
   description = "allow inbound access from the ALB only"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
 
   ingress {
     protocol        = "tcp"

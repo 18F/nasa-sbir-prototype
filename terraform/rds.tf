@@ -11,7 +11,7 @@ resource "random_string" "database_username" {
 
 resource "aws_db_subnet_group" "default" {
   name       = local.resource_prefix
-  subnet_ids = aws_subnet.private.*.id
+  subnet_ids = var.private_subnet_ids.*
 
   tags = merge(
     local.tags

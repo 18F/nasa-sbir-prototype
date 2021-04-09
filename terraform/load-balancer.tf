@@ -1,6 +1,6 @@
 resource "aws_lb" "api" {
   name            = "${local.resource_prefix}-api"
-  subnets         = aws_subnet.public.*.id
+  subnets         = var.public_subnet_ids.*
   security_groups = [aws_security_group.lb.id]
 
   tags = merge(
@@ -12,7 +12,7 @@ resource "aws_lb_target_group" "api" {
   name        = "${local.resource_prefix}-api"
   port        = 80
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = var.vpc_id
   target_type = "ip"
 
   health_check {

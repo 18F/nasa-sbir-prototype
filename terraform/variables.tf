@@ -5,7 +5,7 @@ variable "aws_profile" {
 
 variable "aws_region" {
   type    = string
-  default = "us-east-1"
+  default = "us-west-2"
 }
 
 variable "az_count" {
@@ -23,6 +23,18 @@ locals {
     project = "1337_nasa_sbir"
   }
   resource_prefix = "ehb-prototype"
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "public_subnet_ids" {
+  type = list(string)
+}
+
+variable "private_subnet_ids" {
+  type = list(string)
 }
 
 # === App-specific ===
