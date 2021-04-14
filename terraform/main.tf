@@ -3,7 +3,7 @@ terraform {
     bucket  = "terraform.sandbox.sbir.nasa"
     key     = "terraform.tfstate"
     profile = "sbir-sandbox"
-    region  = "us-east-1"
+    region  = "us-west-2"
   }
 
   required_providers {

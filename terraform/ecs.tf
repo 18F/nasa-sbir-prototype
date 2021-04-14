@@ -17,6 +17,20 @@ locals {
     IMAGE_VERSION  = var.api_container_version
   })
 
+  seed_task_template = templatefile("${path.module}/ecs_task_seed.json.tpl", {
+    DB_NAME        = aws_db_instance.main.name
+    DB_HOST        = aws_db_instance.main.address
+    DB_USER        = urlencode(aws_db_instance.main.username)
+    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    LOG_GROUP      = aws_cloudwatch_log_group.api.name
+    LOG_REGION     = var.aws_region
+    REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
+    IMAGE_VERSION  = var.api_container_version
+    S3_REGION      = var.aws_region
+    S3_DATA_BUCKET = var.s3_data_bucket
+    S3_DATA_FILE   = var.s3_data_file
+  })
+
   service_task_template = templatefile("${path.module}/ecs_task_definition.json.tpl", {
     DB_NAME        = aws_db_instance.main.name
     DB_HOST        = aws_db_instance.main.address
@@ -52,6 +66,21 @@ resource "aws_ecs_task_definition" "database_migration" {
   cpu                      = 256
   memory                   = 512
   container_definitions    = local.migration_task_template
+
+  tags = merge(
+    local.tags
+  )
+}
+
+resource "aws_ecs_task_definition" "database_seed" {
+  family                   = "${local.resource_prefix}-database-seed"
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 256
+  memory                   = 512
+  container_definitions    = local.seed_task_template
 
   tags = merge(
     local.tags

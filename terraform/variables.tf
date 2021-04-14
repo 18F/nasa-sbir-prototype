@@ -44,6 +44,14 @@ locals {
   api_port              = 8000
 }
 
+variable "s3_data_bucket" {
+  type = string
+}
+
+variable "s3_data_file" {
+  type = string
+}
+
 variable "api_container_version" {
   type    = string
   default = "latest"
