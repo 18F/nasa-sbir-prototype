@@ -1,3 +1,7 @@
+output "aws_region" {
+  value = var.aws_region
+}
+
 output "api_cluster" {
   value = aws_ecs_cluster.main.arn
 }

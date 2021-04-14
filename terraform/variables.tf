@@ -1,16 +1,11 @@
 variable "aws_profile" {
   type    = string
-  default = "sbir-sandbox"
+  default = "default"
 }
 
 variable "aws_region" {
   type    = string
   default = "us-west-2"
-}
-
-variable "az_count" {
-  type    = number
-  default = 2
 }
 
 variable "permission_boundary" {
