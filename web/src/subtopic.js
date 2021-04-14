@@ -1,7 +1,8 @@
+import { API_URL } from "./env.js";
 import { makeGraph } from "./graph.js";
 
 const subtopics = new Promise((resolve, reject) => {
-  fetch("//localhost:8081/v1/subtopics/")
+  fetch(`${API_URL}/v1/subtopics/`)
     .then((response) => response.json())
     .then((json) => {
       resolve(Object.entries(json).map(([id, body]) => ({ id, ...body })));
@@ -10,9 +11,7 @@ const subtopics = new Promise((resolve, reject) => {
 });
 
 const setSubtopic = async (app, id) => {
-  const response = await fetch(
-    `//localhost:8081/v1/subtopics/${id}?byYear&byPhase`
-  );
+  const response = await fetch(`${API_URL}/v1/subtopics/${id}?byYear&byPhase`);
   const subtopic = await response.json();
 
   app.view = "single_subtopic";
