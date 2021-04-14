@@ -10,12 +10,15 @@ module.exports = {
       password: process.env.DB_PASSWORD || "sbir",
     },
     seeds: {
-      directory: "./data/seed",
+      directory: "./data/seed/development",
     },
   },
 
   production: {
     client: "postgresql",
     connection: process.env.DATABASE_URL,
+    seeds: {
+      directory: "./data/seed/production",
+    },
   },
 };

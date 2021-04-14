@@ -13,15 +13,13 @@ const truncate = async (knex) => {
 
 exports.seed = async (knex) => {
   if (process.env.NODE_ENV !== "development") {
-    // Only run in dev.
     return;
   }
 
   await truncate(knex);
 
-  const file = fs.createReadStream("./data/seed/input.csv");
   const parser = csvParser({ bom: true, columns: true });
-
+  const file = fs.createReadStream("./data/seed/input.csv");
   file.pipe(parser);
 
   const contracts = new Map();
