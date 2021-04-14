@@ -12,7 +12,8 @@ others that have reasonable defaults you can override. It is best to create a
 [variable definitions file](https://www.terraform.io/docs/language/values/variables.html#variable-definitions-tfvars-files)
 for the required variables as well as any you'd like to override. That way
 you can easily re-run Terraform without having to enter variable values every
-time.
+time. (If you do not create a variable definition file, Terraform will ask you
+for each variable one at a time.)
 
 ```bash
 terraform apply -var-file=your-vars.tfvars.json
