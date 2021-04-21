@@ -21,19 +21,12 @@ const getAllSubtopics = async (subtopicId = false) => {
         .select()
     : await db("proposals").select();
 
-  return subtopics.reduce((all, programSubtopic) => {
-    return {
-      ...all,
-      [programSubtopic]: {
-        ...getAwardStats(
-          proposals.filter(
-            ({ subtopic }) =>
-              subtopic === (programSubtopic === "null" ? null : programSubtopic)
-          )
-        ),
-      },
-    };
-  }, {});
+  return subtopics.map((id) => ({
+    id,
+    ...getAwardStats(
+      proposals.filter(({ subtopic }) => subtopic === (id === null ? null : id))
+    ),
+  }));
 };
 
 const sortBy = (prop) => ({ [prop]: a }, { [prop]: b }) => {
@@ -54,8 +47,10 @@ const getAllSubtopicsByYear = async (subtopicId = false) => {
   );
 
   await Promise.all(
-    Object.entries(subtopics).map(async ([id, subtopic]) => {
-      const proposals = await db("proposals").where({ subtopic: id }).select();
+    subtopics.map(async (subtopic) => {
+      const proposals = await db("proposals")
+        .where({ subtopic: subtopic.id })
+        .select();
       subtopic.years = years.map((year) => ({
         year,
         ...getAwardStats(
@@ -80,8 +75,10 @@ const getAllSubtopicsByPhase = async (subtopicId = false) => {
   );
 
   await Promise.all(
-    Object.entries(subtopics).map(async ([id, subtopic]) => {
-      const proposals = await db("proposals").where({ subtopic: id }).select();
+    subtopics.map(async (subtopic) => {
+      const proposals = await db("proposals")
+        .where({ subtopic: subtopic.id })
+        .select();
 
       subtopic.phases = phases.map((phase) => ({
         phase,
@@ -110,9 +107,9 @@ const getAllSubtopicsByPhaseAndYear = async (subtopicId = false) => {
   );
 
   await Promise.all(
-    Object.entries(subtopics).map(async ([id, subtopic]) => {
+    subtopics.map(async (subtopic) => {
       const proposals = await db("proposals")
-        .where({ subtopic: id === "null" ? null : id })
+        .where({ subtopic: subtopic.id === "null" ? null : subtopic.id })
         .select();
 
       subtopic.phases = phases.map((phase) => {

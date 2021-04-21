@@ -29,14 +29,7 @@ services:
         consistency: delegated
       - /app/node_modules
     ports:
-      - 8081:8000
-  
-  web:
-    image: nginx:stable
-    volumes:
-      - ./web/src:/usr/share/nginx/html
-    ports:
-      - 8080:80
+      - 8080:8000
 
 volumes:
   pgdata:

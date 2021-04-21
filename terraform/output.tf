@@ -37,7 +37,3 @@ output "api_dns" {
 output "container_registry_url" {
   value = aws_ecr_repository.api.repository_url
 }
-
-output "web_dns" {
-  value = aws_cloudfront_distribution.website_distribution.domain_name
-}

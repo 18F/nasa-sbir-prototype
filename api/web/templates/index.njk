@@ -1,0 +1,37 @@
+{% extends "parts/main.njk" %}
+{% block main %}
+
+  {% set headers = ["id", "proposals", "awards", "ratio"] %}
+
+  <div id="all-subtopics">
+    <table>
+      <thead>
+        <tr>
+          {% for header in headers %}
+            <th>
+              <a href="/?sort={{header}}{% if sorting.desc === header %}&order=desc{% endif %}">{{header}}</a>
+            </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for subtopic in subtopics %}
+          <tr>
+            {% for header in headers %}
+              {% if loop.index === 1 %}
+                <td>
+                  <strong>
+                    <a href="/subtopic?id={{subtopic[header]}}">{{subtopic[header]}}</a>
+                  </strong>
+                </td>
+              {% else %}
+                <td>{{subtopic[header]}}</td>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

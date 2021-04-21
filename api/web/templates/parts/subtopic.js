@@ -1,5 +1,6 @@
-/* global d3 */
+/* global d3 document */
 
+// eslint-disable-next-line no-unused-vars
 const makeGraph = (
   data = [],
   {
@@ -83,10 +84,6 @@ const makeGraph = (
     y: Array.isArray(yValue) ? yValue : [yValue],
   }));
 
-  // for (let i = 0; i < graphData.length - 1; i += 2) {
-  //   graphData.splice(i + 1, 0, { x: graphData[i].x + 1, y: graphData[i].y });
-  // }
-
   if (graphData.length > 0) {
     const graphCount = graphData[0].y.length;
 
@@ -113,5 +110,37 @@ const makeGraph = (
   return svg.node();
 };
 
-export default { makeGraph };
-export { makeGraph };
+const graphOptions = {
+  height: 300,
+  width: 400,
+  margin: {
+    bottom: 20,
+    left: 30,
+    right: 0,
+    top: 10,
+  },
+};
+
+// eslint-disable-next-line no-unused-vars
+const main = (subtopic) => {
+  subtopic.phases.forEach((phase) => {
+    const svg = makeGraph(
+      phase.years.map(({ awards, proposals, year }) => ({
+        x: year,
+        y: [
+          {
+            color: "orange",
+            y: proposals,
+          },
+          {
+            color: "green",
+            y: awards,
+          },
+        ],
+      })),
+      graphOptions
+    );
+
+    document.getElementById(`graph-${phase.phase}`).append(svg);
+  });
+};
