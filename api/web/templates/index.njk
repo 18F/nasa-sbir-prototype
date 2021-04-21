@@ -1,7 +1,21 @@
 {% extends "parts/main.njk" %}
 {% block main %}
 
-  {% set headers = ["id", "proposals", "awards", "ratio"] %}
+  {% set headers = [
+    {
+      field: "id",
+      name: "Subtopic"
+    }, {
+      field: "proposals",
+      name: "Proposals"
+    }, {
+      field: "awards",
+      name: "Awards"
+    }, {
+      field: "ratio",
+      name: "Ratio"
+    }
+  ] %}
 
   <div id="all-subtopics">
     <table>
@@ -9,7 +23,7 @@
         <tr>
           {% for header in headers %}
             <th>
-              <a href="/?sort={{header}}{% if sorting.desc === header %}&order=desc{% endif %}">{{header}}</a>
+              <a href="/?sort={{header.field}}{% if sorting.desc === header.field %}&order=desc{% endif %}">{{header.name}}</a>
             </th>
           {% endfor %}
         </tr>
@@ -18,14 +32,14 @@
         {% for subtopic in subtopics %}
           <tr>
             {% for header in headers %}
-              {% if loop.index === 1 %}
+              {% if loop.first %}
                 <td>
                   <strong>
-                    <a href="/subtopic?id={{subtopic[header]}}">{{subtopic[header]}}</a>
+                    <a href="/subtopic?id={{subtopic[header.field]}}">{{subtopic[header.field]}}</a>
                   </strong>
                 </td>
               {% else %}
-                <td>{{subtopic[header]}}</td>
+                <td>{{subtopic[header.field]}}</td>
               {% endif %}
             {% endfor %}
           </tr>
