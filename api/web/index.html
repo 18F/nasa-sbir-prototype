@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+      @import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@100;700&display=swap");
+
+      body {
+        font-family: "Public Sans", sans-serif;
+      }
+
+      #all-subtopics table thead th {
+        background: white;
+        border-bottom: 1px solid black;
+        cursor: pointer;
+        padding-right: 20px;
+        position: sticky;
+        top: 0;
+      }
+
+      #all-subtopics table tbody tr:nth-child(even) {
+        background: #eef;
+      }
+
+      #subtopic-grid {
+        display: grid;
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 50vh 50vh;
+      }
+
+      svg {
+        max-height: 45vh;
+        max-width: 45vw;
+      }
+
+      svg .grid-line g.tick line {
+        stroke-opacity: 0.1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app" style="display: none">
+      <div id="all-subtopics" v-if="view === 'all_subtopics'">
+        <table>
+          <thead>
+            <tr>
+              <th v-on:click="sortSubtopicsBy('id')">Subtopic</th>
+              <th v-on:click="sortSubtopicsBy('proposals')">Proposals</th>
+              <th v-on:click="sortSubtopicsBy('awards')">Awards</th>
+              <th v-on:click="sortSubtopicsBy('ratio')">Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="subtopic in subtopics">
+              <td>
+                <strong
+                  ><a v-bind:href="`#subtopic:${subtopic.id}`"
+                    >{{ subtopic.id }}</a
+                  ></strong
+                >
+              </td>
+              <td>{{subtopic.proposals}}</td>
+              <td>{{subtopic.awards}}</td>
+              <td>{{subtopic.ratio}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div v-if="view === 'single_subtopic' && subtopic">
+        <h1>{{subtopic.id}}</h1>
+
+        <div id="subtopic-grid">
+          <div v-for="phase in subtopic.phases">
+            <h2>Phase {{phase.phase}}</h2>
+            <div v-bind:id="`graph_phase_${phase.phase}`"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <script type="module" type="text/javascript" src="index.js"></script>
+  </body>
+</html>
