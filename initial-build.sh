@@ -52,8 +52,10 @@ run_task "seed"
 API_URL="http://$(terraform output -raw api_dns)"
 
 cat > ../web/src/env.js << EOF
+export const API_URL = "${API_URL};
+
 export default {
-  API_URL: "${API_URL}",
+  API_URL,
 };
 EOF
 
