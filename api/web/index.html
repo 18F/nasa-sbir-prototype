@@ -68,7 +68,8 @@
       </div>
 
       <div v-if="view === 'single_subtopic' && subtopic">
-        <h1>{{subtopic.id}}</h1>
+        <button v-on:click="history.back()">back</button>
+        <h1>Subtopic {{subtopic.id}}</h1>
 
         <div id="subtopic-grid">
           <div v-for="phase in subtopic.phases">

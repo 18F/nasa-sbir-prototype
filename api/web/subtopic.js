@@ -27,7 +27,7 @@ const squashPostPhaseTwo = (subtopic) => {
     }),
     {
       awards: 0,
-      phase: "2*",
+      phase: `2+ (${postPhaseTwos.map(({ phase }) => phase).join(", ")})`,
       proposals: 0,
       ratio: 0,
       years: [],
