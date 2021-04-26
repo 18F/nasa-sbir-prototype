@@ -11,6 +11,17 @@ const truncate = async (knex) => {
   await knex("contracts").del();
 };
 
+const getFiscalYear = (dateString) => {
+  if (dateString) {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+
+    return month < 10 ? year : year + 1;
+  }
+  return null;
+};
+
 exports.seed = async (knex) => {
   if (process.env.NODE_ENV !== "development") {
     return;
@@ -19,7 +30,7 @@ exports.seed = async (knex) => {
   await truncate(knex);
 
   const parser = csvParser({ bom: true, columns: true });
-  const file = fs.createReadStream("./data/seed/input.csv");
+  const file = fs.createReadStream("./data/seed/development/input.csv");
   file.pipe(parser);
 
   const contracts = new Map();
@@ -60,6 +71,7 @@ exports.seed = async (knex) => {
             contract: record.CONTRACT,
             award_amount: +record.AWARD_AMOUNT.replace(/\D/g, ""),
             start_date: record.STARTDATE || null,
+            start_fy: getFiscalYear(record.STARTDATE),
             end_date: record.ENDDATE || null,
             status: record.CONTRACT_STATUS,
           })

@@ -1,4 +1,3 @@
-const fs = require("fs");
 const csvParser = require("csv-parse");
 const { GetObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
@@ -10,6 +9,16 @@ const truncate = async (knex) => {
 
   await knex("firms").del();
   await knex("contracts").del();
+};
+
+const getFiscalYear = (dateString) => {
+  if (dateString) {
+    const date = new Date(Date.parse(dateString));
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    return month < 10 ? year : year + 1;
+  }
+  return null;
 };
 
 exports.seed = async (knex) => {
@@ -72,6 +81,7 @@ exports.seed = async (knex) => {
             contract: record.CONTRACT,
             award_amount: +record.AWARD_AMOUNT.replace(/\D/g, ""),
             start_date: record.STARTDATE || null,
+            start_fy: getFiscalYear(record.STARTDATE),
             end_date: record.ENDDATE || null,
             status: record.CONTRACT_STATUS,
           })
