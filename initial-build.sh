@@ -48,3 +48,7 @@ run_task () {
 run_task "migration"
 #### --- need to wait here for the migration to finish ---
 run_task "seed"
+
+# Command to force a service update; e.g., after pushing a new latest container
+# image to ECR:
+#   aws ecs update-service --force-new-deployment --service my-service --cluster cluster-name
