@@ -119,10 +119,14 @@ const seed = async (knex, parser) => {
   // 2 proposal for the same program year.
   const postPhase2s = await knex("proposals")
     .select("id", "firm_id", "program_year", "proposal")
-    .where("phase", "3")
-    .orWhere("phase", "2E")
-    .orWhere("phase", "2S")
-    .orWhere("phase", "2X");
+    .whereNotNull("contract_id")
+    .andWhere((builder) => {
+      builder
+        .where("phase", "3")
+        .orWhere("phase", "2E")
+        .orWhere("phase", "2S")
+        .orWhere("phase", "2X");
+    });
   await Promise.all(
     postPhase2s.map(
       async ({ id, firm_id: firm, program_year: year, proposal }) => {
