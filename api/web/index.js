@@ -1,3 +1,4 @@
+import { loadFirms } from "./firms/firms.js";
 import { setSubtopic } from "./subtopic/subtopic.js";
 import { loadList } from "./subtopic-list/list.js";
 
@@ -13,6 +14,11 @@ const switchViews = () => {
   const nav = hash.split(":").shift().toLowerCase();
 
   switch (nav) {
+    case "firms":
+      app.view = "firms";
+      loadFirms();
+      break;
+
     case "subtopic":
       app.view = "single_subtopic";
       setSubtopic(initial.split(":").pop());

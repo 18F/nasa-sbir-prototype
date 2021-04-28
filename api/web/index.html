@@ -40,6 +40,7 @@
   </head>
   <body>
     <div id="app" style="display: none">
+      <firms v-bind:show="view === 'firms'"></firms>
       <subtopic-list v-bind:show="view === 'all_subtopics'"></subtopic-list>
       <subtopic v-bind:show="view === 'single_subtopic'"></subtopic>
     </div>

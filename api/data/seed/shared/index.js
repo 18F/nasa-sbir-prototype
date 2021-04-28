@@ -92,74 +92,111 @@ const seed = async (knex, parser) => {
     }
   }
 
-  // Link phase 2s to their predecessor phase 1s.
+  // Link phase 2s and 2+s to their predecessor phase 1s and 2s.
   const phase2s = await knex("proposals")
-    .select("id", "proposal")
+    .select("id", "phase", "proposal")
     .whereNotNull("proposal")
-    .andWhere({ phase: "2" });
+    .andWhere((builder) => builder.whereNot("phase", "1"));
+
   await Promise.all(
-    phase2s.map(async ({ id, proposal }) => {
-      // A phase 1 is associated to the phase 2 if it has the same proposal text
-      const phase1 = await knex("proposals")
+    phase2s.map(async ({ id, phase, proposal }) => {
+      // If this is a phase 2 proposal, the previous phase is 1. Otherwise, the
+      // previous phase is phase 2. If this is a phase 3 with a prior 2+, we'll
+      // fix that later, after we've built all the associations.
+      const previousPhase = phase === "2" ? "1" : "2";
+
+      // A previous phase is associated to this one if it has the same
+      // proposal text
+      const previousProposal = await knex("proposals")
         .select("id")
-        .where({ proposal })
+        .where({ phase: previousPhase, proposal })
         .first();
 
-      if (phase1) {
+      if (previousProposal) {
         await knex("proposals")
           .where({ id })
-          .update({ previous_proposal_id: phase1.id });
+          .update({ previous_proposal_id: previousProposal.id });
       }
     })
   );
 
-  // Now get the phase 2+ and phase 3s so we can link those back to phase 2s.
-  // A phase 2+ or 3 is related to a phase 2 if it has the same proposal as the
-  // phase 2, OR, if the proposal is missing, if the firm has exactly one phase
-  // 2 proposal for the same program year.
-  const postPhase2s = await knex("proposals")
-    .select("id", "firm_id", "program_year", "proposal")
-    .whereNotNull("contract_id")
-    .andWhere((builder) => {
-      builder
-        .where("phase", "3")
-        .orWhere("phase", "2E")
-        .orWhere("phase", "2S")
-        .orWhere("phase", "2X");
-    });
+  // Now get the phase 3s so we can link those back to phase 2s.
+  // A 3 is related to a phase 2 if it has the same proposal as the phase 2,
+  // OR, if the proposal is missing, if the firm has exactly one phase 2
+  // proposal for the same program year.
+  //
+  // ===========================================================================
+  // === This logic doesn't hold up. This is commented out for now, but      ===
+  // === maybe we can put it back in a modified form at some point. But it   ===
+  // === is not this day.                                                    ===
+  // ===========================================================================
+  //
+  // const awardedPhase3s = await knex("proposals")
+  //   .select("id", "firm_id", "program_year", "proposal")
+  //   .whereNotNull("contract_id")
+  //   .andWhere("phase", "3");
+  // await Promise.all(
+  //   awardedPhase3s.map(
+  //     async ({ id, firm_id: firm, program_year: year, proposal }) => {
+  //       // If the phase 3 has a proposal text, check for a corresponding phase 2
+  //       // first. That's the easiest and best path.
+  //       if (proposal) {
+  //         const phase2 = await knex("proposals")
+  //           .select("id")
+  //           .where({ phase: "2", proposal })
+  //           .first();
+
+  //         if (phase2) {
+  //           return knex("proposals")
+  //             .where({ id })
+  //             .update({ previous_proposal_id: phase2.id });
+  //         }
+  //       }
+
+  //       // Otherwise, select all phase 2s from the same firm and the same
+  //       // program year.
+  //       const possiblePhase2s = await knex("proposals")
+  //         .select("id")
+  //         .where({ firm_id: firm, phase: "2", program_year: year });
+
+  //       // If there's just one, we have our match.
+  //       if (possiblePhase2s.length === 1) {
+  //         await knex("proposals")
+  //           .where({ id })
+  //           .update({ previous_proposal_id: possiblePhase2s[0].id });
+  //       }
+  //       return Promise.resolve();
+  //     }
+  //   )
+  // );
+
+  // Lastly, we need to update any phase 3s where the previous proposal might
+  // ACTUALLY be a phase 2+. But we couldn't do that until the first pass of
+  // mappings was finished.
+  const phase3s = await knex("proposals")
+    .whereNotNull("previous_proposal_id")
+    .andWhere({ phase: "3" });
+  const phase2Plus = await knex("proposals")
+    .whereNotNull("previous_proposal_id")
+    .andWhere("phase", "like", "2_");
+
+  // Map phase 2 IDs to the 2+ IDs that they precede.
+  const phase2ToPostPhase2Map = phase2Plus.reduce(
+    (o, { id, previous_proposal_id: prev }) => ({ ...o, [prev]: id }),
+    {}
+  );
+
   await Promise.all(
-    postPhase2s.map(
-      async ({ id, firm_id: firm, program_year: year, proposal }) => {
-        // If the phase 2+/3 has a proposal, check for a corresponding
-        // phase 2 first. That's the easiest and best path.
-        if (proposal) {
-          const phase2 = await knex("proposals")
-            .select("id")
-            .where({ phase: "2", proposal })
-            .first();
-
-          if (phase2) {
-            return knex("proposals")
-              .where({ id })
-              .update({ previous_proposal_id: phase2.id });
-          }
-        }
-
-        // Otherwise, select all phase 2s from the same firm and the same
-        // program year.
-        const possiblePhase2s = await knex("proposals")
-          .select("id")
-          .where({ firm_id: firm, phase: "2", program_year: year });
-
-        // If there's just one, we have our match.
-        if (possiblePhase2s.length === 1) {
-          await knex("proposals")
-            .where({ id })
-            .update({ previous_proposal_id: possiblePhase2s[0].id });
-        }
-        return Promise.resolve();
+    phase3s.map(async ({ id, previous_proposal_id: prev }) => {
+      // If there is a phase 2 proposal in the mapping with this predecessor ID,
+      // then the predecessor is REALLY a 2+. Grab its ID from the map and
+      // update the database.
+      if (phase2ToPostPhase2Map[prev]) {
+        await knex("proposals")
+          .where({ id })
+          .update({ previous_proposal_id: phase2ToPostPhase2Map[prev] });
       }
-    )
+    })
   );
 };
 

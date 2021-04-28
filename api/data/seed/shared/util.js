@@ -16,6 +16,11 @@ const truncate = async (knex) => {
 
   await knex("firms").del();
   await knex("contracts").del();
+
+  // Reset increment
+  await knex.raw("ALTER SEQUENCE proposals_id_seq RESTART WITH 1");
+  await knex.raw("ALTER SEQUENCE firms_id_seq RESTART WITH 1");
+  await knex.raw("ALTER SEQUENCE contracts_id_seq RESTART WITH 1");
 };
 
 module.exports = { getFiscalYear, truncate };
