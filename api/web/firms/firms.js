@@ -59,8 +59,6 @@ const loadFirms = async () => {
         []
       )
       .filter(({ y }) => y <= 1);
-
-    console.log(data.graphData);
   }
 
   const height = 300;
