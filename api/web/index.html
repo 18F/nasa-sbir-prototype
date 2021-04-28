@@ -40,45 +40,10 @@
   </head>
   <body>
     <div id="app" style="display: none">
-      <div id="all-subtopics" v-if="view === 'all_subtopics'">
-        <table>
-          <thead>
-            <tr>
-              <th v-on:click="sortSubtopicsBy('id')">Subtopic</th>
-              <th v-on:click="sortSubtopicsBy('proposals')">Proposals</th>
-              <th v-on:click="sortSubtopicsBy('awards')">Awards</th>
-              <th v-on:click="sortSubtopicsBy('ratio')">Ratio</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="subtopic in subtopics">
-              <td>
-                <strong
-                  ><a v-bind:href="`#subtopic:${subtopic.id}`"
-                    >{{ subtopic.id }}</a
-                  ></strong
-                >
-              </td>
-              <td>{{subtopic.proposals}}</td>
-              <td>{{subtopic.awards}}</td>
-              <td>{{subtopic.ratio}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="view === 'single_subtopic' && subtopic">
-        <button v-on:click="history.back()">back</button>
-        <h1>Subtopic {{subtopic.id}}</h1>
-
-        <div id="subtopic-grid">
-          <div v-for="phase in subtopic.phases">
-            <h2>Phase {{phase.phase}}</h2>
-            <div v-bind:id="`graph_phase_${phase.phase}`"></div>
-          </div>
-        </div>
-      </div>
+      <subtopic-list v-bind:show="view === 'all_subtopics'"></subtopic-list>
+      <subtopic v-bind:show="view === 'single_subtopic'"></subtopic>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
     <script src="https://d3js.org/d3.v6.min.js"></script>
 

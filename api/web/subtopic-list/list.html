@@ -1,0 +1,26 @@
+<div id="all-subtopics" v-if="show">
+  <table>
+    <thead>
+      <tr>
+        <th v-on:click="sortSubtopicsBy('id')">Subtopic</th>
+        <th v-on:click="sortSubtopicsBy('proposals')">Proposals</th>
+        <th v-on:click="sortSubtopicsBy('awards')">Awards</th>
+        <th v-on:click="sortSubtopicsBy('ratio')">Ratio</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="subtopic in subtopics">
+        <td>
+          <strong
+            ><a v-bind:href="`#subtopic:${subtopic.id}`"
+              >{{ subtopic.id }}</a
+            ></strong
+          >
+        </td>
+        <td>{{subtopic.proposals}}</td>
+        <td>{{subtopic.awards}}</td>
+        <td>{{subtopic.ratio}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

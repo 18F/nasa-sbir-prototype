@@ -1,0 +1,11 @@
+<div v-if="show && subtopic">
+  <button v-on:click="history.back()">back</button>
+  <h1>Subtopic {{subtopic.id}}</h1>
+
+  <div id="subtopic-grid">
+    <div v-for="phase in subtopic.phases">
+      <h2>Phase {{phase.phase}}</h2>
+      <div v-bind:id="`graph_phase_${phase.phase}`"></div>
+    </div>
+  </div>
+</div>
