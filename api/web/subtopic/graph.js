@@ -1,5 +1,3 @@
-/* global d3 */
-
 const makeGraph = (
   data = [],
   {

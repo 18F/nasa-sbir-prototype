@@ -45,9 +45,11 @@ Vue.component("subtopic-list", async (resolve) => {
   });
 });
 
-fetch(`${API_URL}/v1/subtopics/`)
-  .then((response) => response.json())
-  .then((subtopics) => {
+const loadList = async () => {
+  if (data.subtopics.length === 0) {
+    const response = await fetch(`${API_URL}/v1/subtopics/`);
+    const subtopics = await response.json();
+
     Object.values(subtopics).forEach((subtopic) => {
       subtopic.ratio = percent.format(subtopic.ratio);
     });
@@ -62,4 +64,7 @@ fetch(`${API_URL}/v1/subtopics/`)
     });
 
     data.subtopics = subtopics;
-  });
+  }
+};
+
+export { loadList };

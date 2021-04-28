@@ -1,5 +1,5 @@
 import { setSubtopic } from "./subtopic/subtopic.js";
-import "./subtopic-list/list.js";
+import { loadList } from "./subtopic-list/list.js";
 
 const app = new Vue({
   el: "#app",
@@ -8,10 +8,10 @@ const app = new Vue({
   },
 });
 
-{
-  // Set initial location.
-  const initial = window.location.hash.replace("#", "");
-  const nav = initial.split(":").shift().toLowerCase();
+const switchViews = () => {
+  const hash = window.location.hash.replace("#", "");
+  const nav = hash.split(":").shift().toLowerCase();
+
   switch (nav) {
     case "subtopic":
       app.view = "single_subtopic";
@@ -20,23 +20,14 @@ const app = new Vue({
 
     default:
       app.view = "all_subtopics";
+      loadList();
       break;
   }
-}
+};
 
-window.addEventListener("hashchange", () => {
-  const hash = window.location.hash.replace("#", "");
-  const nav = hash.split(":").shift().toLowerCase();
+// Set initial location.
+switchViews();
 
-  switch (nav) {
-    case "subtopic":
-      app.view = "single_subtopic";
-      setSubtopic(hash.split(":").pop());
-      break;
-    default:
-      app.view = "all_subtopics";
-      break;
-  }
-});
+window.addEventListener("hashchange", switchViews);
 
 document.getElementById("app").style.display = "block";

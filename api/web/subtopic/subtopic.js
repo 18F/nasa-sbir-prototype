@@ -1,5 +1,5 @@
 import { API_URL } from "../env.js";
-import { makeGraph } from "../graph.js";
+import { makeGraph } from "./graph.js";
 
 const data = { subtopic: null };
 
