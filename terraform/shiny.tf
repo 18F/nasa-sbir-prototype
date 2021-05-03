@@ -1,3 +1,7 @@
+locals {
+  shiny_port = 3838
+}
+
 resource "aws_lb" "shiny" {
   name            = "${local.resource_prefix}-shiny"
   subnets         = var.public_subnet_ids.*
@@ -19,8 +23,7 @@ resource "aws_lb_target_group" "shiny" {
     healthy_threshold   = "3"
     interval            = "30"
     protocol            = "HTTP"
-    port                = "3838"
-    matcher             = "200"
+    matcher             = "200-299"
     timeout             = "3"
     path                = "/"
     unhealthy_threshold = "2"
@@ -74,8 +77,7 @@ resource "aws_ecs_task_definition" "shiny" {
       },
       "portMappings": [
         {
-          "containerPort": 3838,
-          "hostPort": 3838
+          "containerPort": ${local.shiny_port}
         }
       ],
       "user": "shiny"
@@ -96,7 +98,7 @@ resource "aws_ecs_service" "shiny" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    security_groups  = [aws_security_group.ecs_tasks.id]
+    security_groups  = [aws_security_group.shiny.id]
     subnets          = var.private_subnet_ids.*
     assign_public_ip = true
   }
@@ -104,7 +106,7 @@ resource "aws_ecs_service" "shiny" {
   load_balancer {
     target_group_arn = aws_lb_target_group.shiny.id
     container_name   = "shiny"
-    container_port   = 3838
+    container_port   = local.shiny_port
   }
 
   depends_on = [aws_lb_listener.shiny, aws_iam_role_policy_attachment.ecs_task_execution_policy]

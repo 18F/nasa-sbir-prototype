@@ -77,3 +77,28 @@ resource "aws_security_group" "ecs_tasks" {
     { Name = "${local.resource_prefix}-ecs-task" }
   )
 }
+
+resource "aws_security_group" "shiny" {
+  name        = "${local.resource_prefix}-shiny"
+  description = "allow inbound access from the ALB only"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    protocol        = "tcp"
+    from_port       = 3838
+    to_port         = 3838
+    security_groups = [aws_security_group.lb.id]
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags,
+    { Name = "${local.resource_prefix}-shiny" }
+  )
+}
