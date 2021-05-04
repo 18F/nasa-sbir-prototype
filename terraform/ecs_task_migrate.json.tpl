@@ -16,7 +16,7 @@
       "options": {
         "awslogs-group": "${LOG_GROUP}",
         "awslogs-region": "${LOG_REGION}",
-        "awslogs-stream-prefix": "ehb-ecs-database"
+        "awslogs-stream-prefix": "sbir-ecs-database"
       }
     }
   }

@@ -17,7 +17,7 @@ locals {
     Name    = local.resource_prefix
     project = "1337_nasa_sbir"
   }
-  resource_prefix = "ehb-prototype"
+  resource_prefix = "sbir-prototype"
 }
 
 variable "vpc_id" {

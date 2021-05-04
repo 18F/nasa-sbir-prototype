@@ -19,7 +19,7 @@
       "options": {
         "awslogs-group": "${LOG_GROUP}",
         "awslogs-region": "${LOG_REGION}",
-        "awslogs-stream-prefix": "ehb-ecs"
+        "awslogs-stream-prefix": "sbir-ecs"
       }
     },
     "portMappings": [
