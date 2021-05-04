@@ -15,6 +15,21 @@ resource "aws_iam_role" "ecs_task_execution_role" {
   assume_role_policy   = data.aws_iam_policy_document.assume_role_policy.json
   permissions_boundary = var.permission_boundary
 
+  # Allow ECS tasks to read the database connection string from the SSM
+  inline_policy {
+    name = "${local.resource_prefix}-ecs-task-policy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Action   = ["ssm:GetParameters"]
+          Effect   = "Allow"
+          Resource = ["${aws_ssm_parameter.db_connection_string.arn}"]
+        }
+      ]
+    })
+  }
+
   tags = merge(
     local.tags
   )

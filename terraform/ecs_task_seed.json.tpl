@@ -15,9 +15,10 @@
     },{
       "name": "S3_DATA_FILE",
       "value": "${S3_DATA_FILE}"
-    },{
+    }],
+    "secrets": [{
       "name": "DATABASE_URL",
-      "value": "postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}"
+      "valueFrom": "${DB_URL_ARN}"
     }],
     "logConfiguration": {
       "logDriver": "awslogs",

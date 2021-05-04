@@ -7,10 +7,7 @@ resource "aws_ecs_cluster" "main" {
 
 locals {
   migration_task_template = templatefile("${path.module}/ecs_task_migrate.json.tpl", {
-    DB_NAME        = aws_db_instance.main.name
-    DB_HOST        = aws_db_instance.main.address
-    DB_USER        = urlencode(aws_db_instance.main.username)
-    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    DB_URL_ARN     = aws_ssm_parameter.db_connection_string.arn
     LOG_GROUP      = aws_cloudwatch_log_group.api.name
     LOG_REGION     = var.aws_region
     REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
@@ -18,10 +15,7 @@ locals {
   })
 
   seed_task_template = templatefile("${path.module}/ecs_task_seed.json.tpl", {
-    DB_NAME        = aws_db_instance.main.name
-    DB_HOST        = aws_db_instance.main.address
-    DB_USER        = urlencode(aws_db_instance.main.username)
-    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    DB_URL_ARN     = aws_ssm_parameter.db_connection_string.arn
     LOG_GROUP      = aws_cloudwatch_log_group.api.name
     LOG_REGION     = var.aws_region
     REPOSITORY_URL = replace(aws_ecr_repository.api.repository_url, "https://", "")
@@ -32,10 +26,7 @@ locals {
   })
 
   service_task_template = templatefile("${path.module}/ecs_task_definition.json.tpl", {
-    DB_NAME        = aws_db_instance.main.name
-    DB_HOST        = aws_db_instance.main.address
-    DB_USER        = urlencode(aws_db_instance.main.username)
-    DB_PASSWORD    = urlencode(aws_db_instance.main.password)
+    DB_URL_ARN     = aws_ssm_parameter.db_connection_string.arn
     PORT           = local.api_port
     LOG_GROUP      = aws_cloudwatch_log_group.api.name
     LOG_REGION     = var.aws_region
