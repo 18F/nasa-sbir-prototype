@@ -7,9 +7,12 @@
     "import/extensions": ["error", "always"],
     "no-param-reassign": ["error", { "props": false }]
   },
+  "globals": {
+    "d3": true,
+    "Vue": true
+  },
   "env": {
     "es6": true,
-    "browser": true,
-    "vue": true
+    "browser": true
   }
 }

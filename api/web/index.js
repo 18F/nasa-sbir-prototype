@@ -21,7 +21,7 @@ const switchViews = () => {
 
     case "subtopic":
       app.view = "single_subtopic";
-      setSubtopic(initial.split(":").pop());
+      setSubtopic(hash.split(":").pop());
       break;
 
     default:
