@@ -14,11 +14,15 @@
     "pg": "^8.5.1"
   },
   "devDependencies": {
-    "@18f/18f-eslint": "^1.2.5",
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.22.1",
     "prettier": "^2.2.1"
   },
   "scripts": {
-    "lint": "18f-eslint",
+    "lint": "eslint '**/*.js'",
     "migrate": "knex migrate:latest",
     "start": "npx nodemon index.js",
     "start-dev": "npm run migrate && npx nodemon index.js",

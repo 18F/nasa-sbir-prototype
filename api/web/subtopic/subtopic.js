@@ -1,12 +1,12 @@
 import { API_URL } from "../env.js";
 import { makeGraph } from "./graph.js";
 
-const data = { subtopic: null };
+const componentData = { subtopic: null };
 
 Vue.component("subtopic", async (resolve) => {
   const response = await fetch("subtopic/subtopic.html");
   resolve({
-    data: () => data,
+    data: () => componentData,
     props: ["show"],
     template: await response.text(),
   });
@@ -69,7 +69,7 @@ const setSubtopic = async (id) => {
 
   squashPostPhaseTwo(subtopic);
 
-  data.subtopic = subtopic;
+  componentData.subtopic = subtopic;
   window.scrollTo(0, 0);
 
   const graphOptions = {
@@ -79,7 +79,7 @@ const setSubtopic = async (id) => {
   };
 
   setTimeout(() => {
-    data.subtopic.phases.forEach((phase) => {
+    componentData.subtopic.phases.forEach((phase) => {
       const svg = makeGraph(
         phase.years.map(({ awards, proposals, year }) => ({
           x: year,
@@ -96,4 +96,5 @@ const setSubtopic = async (id) => {
   });
 };
 
+export default { setSubtopic };
 export { setSubtopic };

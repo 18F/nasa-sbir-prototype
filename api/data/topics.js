@@ -18,16 +18,17 @@ const getAllTopics = async (topicId = false) => {
     ? await db("proposals").where({ topic: topicId }).select()
     : await db("proposals").select();
 
-  return topics.reduce((all, programTopic) => {
-    return {
+  return topics.reduce(
+    (all, programTopic) => ({
       ...all,
       [programTopic]: {
         ...getAwardStats(
           proposals.filter(({ topic }) => topic === programTopic)
         ),
       },
-    };
-  }, {});
+    }),
+    {}
+  );
 };
 
 module.exports = { getAllTopics };

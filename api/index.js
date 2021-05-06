@@ -23,6 +23,7 @@ const main = async () => {
   app.use(base.routes(), base.allowedMethods());
 
   app.listen(port, () => {
+    // eslint-disable-next-line no-console
     console.log(`now listening on ${port}`);
   });
 };

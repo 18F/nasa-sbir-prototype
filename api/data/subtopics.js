@@ -120,16 +120,14 @@ const getAllSubtopicsByPhaseAndYear = async (subtopicId = false) => {
         const phaseInfo = {
           phase,
           ...getAwardStats(phaseProposals),
-          years: years.map((year) => {
-            return {
-              year,
-              ...getAwardStats(
-                phaseProposals.filter(
-                  ({ program_year: programYear }) => year === programYear
-                )
-              ),
-            };
-          }),
+          years: years.map((year) => ({
+            year,
+            ...getAwardStats(
+              phaseProposals.filter(
+                ({ program_year: programYear }) => year === programYear
+              )
+            ),
+          })),
         };
 
         phaseInfo.years.sort(sortBy("year"));

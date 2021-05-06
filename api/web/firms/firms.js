@@ -51,9 +51,7 @@ const loadFirms = async () => {
                 0,
                 0,
               ])
-              .reduce((_, __, ___, [p2, p1]) => {
-                return p2 / p1;
-              }),
+              .reduce((_, __, ___, [p2, p1]) => p2 / p1),
           },
         ],
         []
@@ -112,4 +110,5 @@ const loadFirms = async () => {
   document.getElementById("firms-graph").append(svg.node());
 };
 
+export default { loadFirms };
 export { loadFirms };

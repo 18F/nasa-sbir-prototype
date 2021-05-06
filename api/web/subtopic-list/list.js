@@ -67,4 +67,5 @@ const loadList = async () => {
   }
 };
 
+export default { loadList };
 export { loadList };
