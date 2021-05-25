@@ -1,23 +1,38 @@
 # Prototype for NASA SBIR infrastructure
 
-## 1. Build the infrastructure
+The infrastructure for the prototype is defined in [Terraform](https://www.terraform.io/).
+The prototype itself is written in Javascript using [Koa](https://koajs.com/)
+for the web server framework and [Knex](http://knexjs.org/) as a database ORM.
 
-```bash
-cd terraform
-terraform apply
-```
+This project includes a Makefile to simplify building the infrastructure,
+deploying the prototype, updating the database, populating the database with
+an initial set of data, and tearing everything down. The Makefile is the
+recommended way of working with the prototype.
 
-There are some configuration variables that **_must_** be set, and several
-others that have reasonable defaults you can override. It is best to create a
-[variable definitions file](https://www.terraform.io/docs/language/values/variables.html#variable-definitions-tfvars-files)
+The Terraform scripts are configured to use an S3 bucket to store state. You
+will need access to that S3 bucket in order to use Terraform.
+
+## Makefile
+
+This repo includes a Makefile to simplify building infrastructure in AWS,
+deploying a version of the prototype, migrating the database, seeding it with
+an initial set of data, and destroying everything. The Makefile will run
+Terraform for you, and requires that you have a file called
+`variables.tfvars.json` in the root of this repo that defines the required
+Terraform variables described in the [Infrastructure](#Infrastructure) section
+below. You are not required to use the Makefile if you prefer to manually run
+the steps, but the Makefile is recommended.
+
+## Infrastructure
+
+In order to build and deploy the infrastructure, you will need to set some
+Terraform variables. There are some configuration variables that **_must_** be
+set, and several others that have reasonable defaults you can override. It is
+best to create a [variable definitions file](https://www.terraform.io/docs/language/values/variables.html#variable-definitions-tfvars-files)
 for the required variables as well as any you'd like to override. That way
 you can easily re-run Terraform without having to enter variable values every
 time. (If you do not create a variable definition file, Terraform will ask you
 for each variable one at a time.)
-
-```bash
-terraform apply -var-file=your-vars.tfvars.json
-```
 
 #### Required variables
 
@@ -43,63 +58,124 @@ infrastructure defined here is destroyed.
 | aws_region            | The AWS region to deploy this infrastructure into. Defaults to `us-west-2`.                                                                                                              |
 | api_container_version | The container version to use for deploying the API task. Defaults to `latest`, which is generally what you want so you can update the API without redeploying the entire infrastructure. |
 
-## 2. Log into the AWS container registry
+To use the Makefile, create a variable definitions file at the root of this repo
+called `variables.tfvars.json` and populate it with the necessary values and any
+optional overrides. This variables file is required for all of the Makefile
+functionality, not just creating infrastructure.
+
+## Build the infrastructure
+
+When the commands below are finished, the DNS URL of the prototype instance will
+be printed to the console. There's nothing there yet since it hasn't been
+deployed, but now you'll know where it's going to go.
+
+### Makefile
 
 ```bash
-aws ecr get-login-password \
-  --region "$(terraform output -raw aws_region)" | \
-  docker login \
-  --username AWS \
-  --password-stdin \
-  "$(terraform output -raw container_registry_url | awk -F/ '{print $1}')"
+make build
 ```
 
-Note that this command makes calls into Terraform to identify the region
-and ECR registry URL, so you do not need to enter those manually.
-
-If you used a non-default profile, you will also need to include a
-`--profile` argument to the `aws ecr` command. E.g.:
+### Manual
 
 ```bash
-aws ecr --profile=my-profile get-login-password [...]
+cd terraform
+terraform apply --var-file [YOUR VAR FILE]
+terraform output api_dns
 ```
 
-## 3. Build the API Docker image
+## Deploy a version of the prototype
+
+### Makefile
 
 ```bash
-docker build \
-  -t "$(terraform output -raw container_registry_url)":latest \
-  api \
-  -f api/Dockerfile.prod
+make deploy
 ```
 
-Again, using Terraform to tell us what to call the image. Note that this
-image is being tagged as `latest`. You can also tag it with a specific
-version number. If you use a version number, you probably _also_ want to tag
-it with latest so the API task will use it whenever it gets restarted:
+### Manual
 
-```bash
-docker tag \
-  "$(terraform output -raw container_registry_url)":1.3 \
-  "$(terraform output -raw container_registry_url)":latest
+1. Log into the AWS container registry with Docker:
+
+   ```bash
+   aws ecr get-login-password \
+     --region "$(terraform output -raw aws_region)" | \
+     docker login \
+     --username AWS \
+     --password-stdin \
+     "$(terraform output -raw container_registry_url | awk -F/ '{print $1}')"
+   ```
+
+   Note that this command makes calls into Terraform to identify the region and
+   ECR registry URL, so you do not need to enter those manually.
+
+   If you used a non-default profile, you will also need to include a
+   `--profile` argument to the `aws ecr` command. E.g.:
+
+   ```bash
+   aws ecr --profile=my-profile get-login-password [...]
+   ```
+
+2. Build the API Docker image
+
+   ```bash
+   docker build \
+     -t "$(terraform output -raw container_registry_url)":latest \
+     api \
+     -f api/Dockerfile.prod
+   ```
+
+   Again, using Terraform to tell us what to call the image. Note that this
+   image is being tagged as `latest`. You can also tag it with a specific
+   version number. If you use a version number, you probably _also_ want to tag
+   it with latest so the API task will use it whenever it gets restarted:
+
+   ```bash
+   docker tag \
+     "$(terraform output -raw container_registry_url)":1.3 \
+     "$(terraform output -raw container_registry_url)":latest
+   ```
+
+3. Push the Docker image to the AWS container registry
+
+   ```bash
+   docker push "$(terraform output -raw container_registry_url)":latest
+   ```
+
+   If you created a specific version, it might be worth pushing that too. It
+   does not take up any more space on AWS, it just adds another tag to the same
+   image. It can be handy to have all deployed versions saved safely in the
+   cloud.
+
+4. Force a redeploy
+
+   If the prototype was already running, pushing a new version does not
+   automatically cause the new version to start running. To do that, y
+
+   ```bash
+   aws ecs \
+     --profile="$(terraform output -raw aws_profile)" \
+     update-service \
+     --force-new-deployment \
+     --service "$(terraform output -raw api_service)" \
+     --cluster "$(terraform output -raw api_cluster)" \
+     --no-cli-pager
+   ```
+
+   This will cause the image tagged according to the `api_container_version`
+   variable (`latest` by default) to be launched, attached to the load balancer,
+   and the older version to be shut down and drained.
+
+## Migrate the database
+
+The first time the prototype is deployed, and again each time the database
+schema is updated, the database will need to be migrated.
+
+### Makefile
+
+```
+make migrate
 ```
 
-## 4. Push the Docker image to the AWS container registry
-
-```bash
-docker push "$(terraform output -raw container_registry_url)":latest
-```
-
-If you created a specific version, it might be worth pushing that too. It
-does not take up any more space on AWS, it just adds another tag to the same
-image. It can be handy to have all deployed versions saved safely in the
-cloud.
-
-## 5. Setup the database
-
-Shortly after the image gets pushed up, AWS will start the API service. In
-the meantime, you'll want to go ahead and setup the database. Run the initial
-schema migration, relying on outputs from Terraform.
+### Manual
 
 ```bash
 cd terraform
@@ -113,11 +189,24 @@ aws ecs run-task \
 You'll need that `--profile` argument again if you used a non-default AWS
 profile in step 1.
 
-If this is the first time you've setup the database, it is still empty. The
-schema migration will only create the database schema to get it ready to use.
-To load an initial set of data, wait until the migration has finished (you
-can check the ECS tasks in the AWS console website to watch for the migration
-task to end), then you will run the seed task:
+## Seed the database
+
+Seeding the database will empty anything that's currently in it and add a fresh
+copy of the initial toy data. This is *necessary* after the first deployment
+because the database starts out empty. It's also useful if the database data
+gets messed up somehow, so you can get back to a known-good state.
+
+If this is the first time you're seeding the database, wait until the migration
+has finished (you can check the ECS tasks in the AWS console website to watch
+for the migration task to end).
+
+### Makefile
+
+```bash
+make seed
+```
+
+### Manual
 
 ```bash
 cd terraform
@@ -128,16 +217,22 @@ aws ecs run-task \
   --launch-type FARGATE
 ```
 
-The only difference between these two is which task definition is being sent
-to AWS to execute.
+## Teardown
 
-## 6. You're done for now!
+When it's time to take the prototype down and you want to teardown all the
+infrastructure that was created, Terraform can handle all that too.
 
-Hooray, your thing is online! You can find the URL for the API with Terraform
+### Makefile
+
+```bash
+make destroy
+```
+
+### Manual
 
 ```bash
 cd terraform
-terraform output api_dns
+terraform destroy --var-file [YOUR VAR FILE]
 ```
 
 ## Contributing
